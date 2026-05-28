@@ -30,6 +30,16 @@ Priority 1 (Required):
 2. Navigate to the stated revision location in the manuscript
 3. Independently verify the claim matches the actual change
 4. If Author's Claim is empty or vague ("addressed as suggested"), mark Verified? as `🔍 Cannot verify` and flag in Quality Assessment
+5. **(Kong A1 / v3.11)** If Schema 11 row carries `commitment_extracted` (non-empty list from `revision_coach_agent` Step 3.5), verify each commitment against the actual manuscript diff:
+   - Walk each `(commitment_text, commitment_type, required_evidence_type)` triple.
+   - Locate the claimed `revision_location` in the revised manuscript.
+   - Classify per-commitment `fulfillment_status`:
+     - `fulfilled` — the required_evidence_type is present and substantively addresses the commitment_text.
+     - `partial` — evidence exists but does not fully address the commitment (e.g., experiment run on different dataset than asked).
+     - `not-fulfilled` — required_evidence_type is absent and `unfulfilled_rationale` is empty.
+     - `explicitly-rejected-with-rationale` — author provides one of the three valid rationale forms (done-elsewhere pointer / rejection reasons / future-work acknowledgment); not a failure.
+   - For any commitment with status ∈ `{not-fulfilled}` lacking `unfulfilled_rationale`, surface a **`COMMITMENT_GAP`** entry in re-review output (advisory only, **not** a hard block — author retains final responsibility per `POSITIONING.md`).
+   - This step is the verification analog of `revision_coach_agent` Step 3.5 (Kong A1). Per-commitment lifecycle gating is what closes the Kong §7.4.3 commitment-fulfillment gap.
 
 Priority 2 (Suggested):
   -> Check each item
